@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>2-9 实战：实现一个贪吃蛇小游戏</title>
+    <script src="./lib/index.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #canvas {
+            margin: 50px auto 0;
+            display: block;
+            background: yellow;
+        }
+
+    </style>
+</head>
+
+<body>
+<canvas id="canvas" width="400" height="400">
+    此浏览器不支持canvas
+</canvas>
+</body>
+</html>
+
+<script>
+    const ctx = document.getElementById('canvas')
+    const gl = ctx.getContext('webgl')
+
+    // 创建着色器源码
+    const VERTEX_SHADER_SOURCE = `
+        // 只传递顶点数据
+        attribute vec4 aPosition;
+        void main() {
+          gl_Position = aPosition; // vec4(0.0,0.0,0.0,1.0)
+          gl_PointSize = 15.0;
+        }
+    `; // 顶点着色器
+
+    const FRAGMENT_SHADER_SOURCE = `
+        void main() {
+          gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        }
+    `; // 片元着色器
+
+
+    const program = initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE)
+
+    // 获取 attribute 变量
+    const aPosition = gl.getAttribLocation(program, 'aPosition')
+
+    // 蛇身的长度
+    let points = [
+        {x: 0, y: 0}
+    ]
+
+    // 食物的坐标
+    const random = {
+        isConnect: true
+    }
+
+    // 移动的速度
+    let originSpeed = 0.02
+
+    // 行动的速度
+    let speed = originSpeed
+
+    // 移动的方向
+    let direction = 'x'
+
+    // 允许吃掉食物的误差范围
+    let base = 1.5
+
+    document.onkeydown = (event) => {
+        switch (event.keyCode) {
+            case 37:
+                direction = 'x'
+                speed = -originSpeed
+                break
+            case 38:
+                direction = 'y'
+                speed = originSpeed
+                break
+            case 39:
+                direction = 'x'
+                speed = originSpeed
+                break
+            case 40:
+                direction = 'y'
+                speed = -originSpeed
+                break
+        }
+    }
+
+    function createRandom() {
+        if (random.isConnect) {
+            random.x = Math.random() * 2 - 1
+            random.y = Math.random() * 2 - 1
+            random.isConnect = false
+        }
+    }
+
+
+    function draw() {
+        gl.vertexAttrib3f(aPosition, random.x, random.y, 0.0);
+        gl.drawArrays(gl.POINTS, 0, 1);
+
+        let preX = 0;
+        let preY = 0;
+        for (let i = 0; i < points.length; i++) {
+            if (i === 0) {
+                preX = points[0].x
+                preY = points[0].y
+                points[0][direction] += speed;
+            } else {
+                let {x, y} = points[i]
+                points[i].x = preX
+                points[i].y = preY
+
+                preX = x;
+                preY = y;
+            }
+
+            gl.vertexAttrib3f(aPosition, points[i].x, points[i].y, 0.0);
+
+            gl.drawArrays(gl.POINTS, 0, 1);
+        }
+    }
+
+    let timer = null
+
+    function start() {
+        timer = setInterval(() => {
+            // 边界判断
+            if (
+                points[0].x > 1.0 ||
+                points[0].x < -1.0 ||
+                points[0].y < -1.0 ||
+                points[0].y > 1.0
+            ) {
+                alert('游戏结束');
+                restart();
+            }
+
+            if (
+                points[0].x > random.x - base * originSpeed &&
+                points[0].x < random.x + base * originSpeed &&
+                points[0].y < random.y + base * originSpeed &&
+                points[0].y > random.y - base * originSpeed
+            ) {
+                points.push({x: random.x, y: random.y})
+                random.isConnect = true;
+            }
+
+            createRandom();
+            draw();
+        }, 100)
+    }
+
+    start();
+
+    function restart() {
+        clearInterval(timer)
+        points = [
+            {x: 0, y: 0}
+        ]
+        direction = 'x'
+        speed = originSpeed
+        start();
+    }
+</script>

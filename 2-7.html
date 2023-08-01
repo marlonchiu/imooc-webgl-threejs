@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>2-7 通过鼠标控制绘制</title>
+    <script src="./lib/index.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #canvas {
+            margin: 50px auto 0;
+            display: block;
+            background: yellow;
+        }
+    </style>
+</head>
+
+<body>
+<canvas id="canvas" width="400" height="400">
+    此浏览器不支持canvas
+</canvas>
+</body>
+</html>
+
+<script>
+    const ctx = document.getElementById('canvas')
+    const gl = ctx.getContext('webgl')
+
+    // 创建着色器源码
+    const VERTEX_SHADER_SOURCE = `
+    // 只传递顶点数据
+    attribute vec4 aPosition;
+    void main() {
+      gl_Position = aPosition; // vec4(0.0,0.0,0.0,1.0)
+      gl_PointSize = 10.0;
+    }
+  `; // 顶点着色器
+
+    const FRAGMENT_SHADER_SOURCE = `
+    void main() {
+      gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+    }
+  `; // 片元着色器
+
+    const program = initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE)
+
+
+    // 获取 attribute 变量
+    const aPosition = gl.getAttribLocation(program, 'aPosition')
+
+    // 给 attribute 赋值
+    gl.vertexAttrib1f(aPosition, 0.0)
+
+    // gl.drawArrays(gl.POINTS, 0, 1)
+    const points = []
+
+    // onmousemove 画笔功能
+    ctx.onclick = function (ev) {
+
+        // 坐标
+        const x = ev.clientX
+        const y = ev.clientY
+
+        const domPosition = ev.target.getBoundingClientRect()
+        // console.log(domPosition, ctx.offsetTop, ctx.offsetLeft)
+
+        // 当前点在画布上的位置
+        const domX = x - domPosition.left
+        const domY = y - domPosition.top
+        // console.log(domX, domY)
+
+        /*
+        0 200 400
+
+        -1 0 1
+
+        -200 0 200
+
+        -1 0 1
+
+        需要先 -200 （当前画布的宽度） 然后再 除以 200
+
+        1 0 -1
+
+        0 200 400
+
+        200 0 -200 / 200
+
+        需要先让 200 减这个数，然后再 / 200
+
+        * */
+        // 获取宽高的一半
+        const halfWidth = ctx.offsetWidth / 2
+        const halfHeight = ctx.offsetHeight / 2
+
+        const clickX = (domX - halfWidth) / halfWidth
+        const clickY = (halfHeight - domY) / halfHeight
+        // console.log(clickX, clickY)
+
+        points.push({
+            clickX,
+            clickY
+        })
+
+        for (let i = 0; i < points.length; i++) {
+            gl.vertexAttrib2f(aPosition, points[i].clickX, points[i].clickY)
+            gl.drawArrays(gl.POINTS, 0, 1)
+        }
+    }
+</script>

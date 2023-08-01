@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>3-10 图形复合变换 - 矩阵组合</title>
+    <script src="./lib/index.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #canvas {
+            margin: 50px auto 0;
+            display: block;
+            background: yellow;
+        }
+    </style>
+</head>
+
+<body>
+<canvas id="canvas" width="400" height="400">
+    此浏览器不支持canvas
+</canvas>
+</body>
+</html>
+
+<script>
+    const ctx = document.getElementById('canvas')
+    const gl = ctx.getContext('webgl')
+
+    // 创建着色器源码
+    const VERTEX_SHADER_SOURCE = `
+        attribute vec4 aPosition;
+        uniform mat4 translateMatrix;
+        uniform mat4 scaleMatrix;
+        uniform mat4 rotationMatrix;
+        void main() {
+          gl_Position = translateMatrix * scaleMatrix * rotationMatrix * aPosition;
+        }
+    `; // 顶点着色器
+
+
+    const FRAGMENT_SHADER_SOURCE = `
+        void main() {
+          gl_FragColor = vec4(1.0, 0.0, 0.0,1.0);
+        }
+    `; // 片元着色器
+
+    const program = initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE)
+
+    // 获取 attribute 变量
+    const aPosition = gl.getAttribLocation(program, 'aPosition')
+    const translateMatrix = gl.getUniformLocation(program, 'translateMatrix')
+    const scaleMatrix = gl.getUniformLocation(program, 'scaleMatrix')
+    const rotationMatrix = gl.getUniformLocation(program, 'rotationMatrix')
+
+
+    const points = new Float32Array([
+        -0.5, -0.5,
+        0.5, -0.5,
+        0.0, 0.5,
+    ])
+
+    // 创建缓冲区对象
+    const buffer = gl.createBuffer()
+    // 绑定缓冲区对象
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+    // 将数据写入缓冲区对象
+    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW) // STATIC_DRAW 写入一次绘制多次
+    // 将缓冲区对象分配给一个 attribute变量
+    gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0)
+    // 开启 attribute 变量
+    gl.enableVertexAttribArray(aPosition)
+
+
+    // 绘图
+    let deg = 0
+    let translateX = -1
+    let scaleX = 0.1
+
+    function animation() {
+        deg += 0.01
+        translateX += 0.01
+        scaleX += 0.01
+
+        if (translateX > 1) {
+            translateX = -1
+        }
+
+        if (scaleX > 1.5) {
+            scaleX = 0.1
+        }
+
+        const rotate = getRotateMatrix(deg)
+        const translate = getTranslateMatrix(translateX)
+        const scale = getScaleMatrix(scaleX)
+
+        gl.uniformMatrix4fv(rotationMatrix, false, rotate)
+        gl.uniformMatrix4fv(translateMatrix, false, translate)
+        gl.uniformMatrix4fv(scaleMatrix, false, scale)
+
+
+        gl.drawArrays(gl.TRIANGLES, 0, 3)
+
+        requestAnimationFrame(animation)
+    }
+
+    animation()
+
+</script>
