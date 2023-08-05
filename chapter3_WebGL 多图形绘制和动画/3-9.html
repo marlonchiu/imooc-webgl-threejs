@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <title>3-2 多缓冲区和数据偏移</title>
-    <script src="./lib/index.js"></script>
+    <title>3-9 图形旋转 - 旋转矩阵</title>
+    <script src="../lib/index.js"></script>
     <style>
         * {
             margin: 0;
@@ -31,12 +31,11 @@
 
     // 创建着色器源码
     const VERTEX_SHADER_SOURCE = `
-        // 只传递顶点数据
         attribute vec4 aPosition;
-        attribute float aPointSize;
+        uniform mat4 mat;
         void main() {
-          gl_Position = aPosition; // vec4(0.0,0.0,0.0,1.0)
-          gl_PointSize = aPointSize;
+          gl_Position = mat * aPosition;
+          gl_PointSize = 10.0;
         }
     `; // 顶点着色器
 
@@ -51,13 +50,13 @@
 
     // 获取 attribute 变量
     const aPosition = gl.getAttribLocation(program, 'aPosition')
-    const aPointSize = gl.getAttribLocation(program, 'aPointSize')
+    const mat = gl.getUniformLocation(program, 'mat')
 
 
     const points = new Float32Array([
-        -0.5, -0.5, // 10.0
-        0.5, -0.5, // 20.0
-        0.0, 0.5, // 30.0
+        -0.5, -0.5,
+        0.5, -0.5,
+        0.0, 0.5,
     ])
 
     // 创建缓冲区对象
@@ -72,19 +71,20 @@
     gl.enableVertexAttribArray(aPosition)
 
 
-    const size = new Float32Array([
-        10.0, // 10.0
-        20.0, // 20.0
-        30.0, // 30.0
-    ])
-
-    const sizeBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, sizeBuffer)
-    gl.bufferData(gl.ARRAY_BUFFER, size, gl.STATIC_DRAW)
-    gl.vertexAttribPointer(aPointSize, 1, gl.FLOAT, false, 0, 0)
-    gl.enableVertexAttribArray(aPointSize)
-
     // 绘图
-    gl.drawArrays(gl.POINTS, 0, 3)
+    let x = 0
+
+    function animation() {
+        x += 0.01
+
+        const matrix = getRotateMatrix(x)
+        gl.uniformMatrix4fv(mat, false, matrix)
+
+        gl.drawArrays(gl.TRIANGLES, 0, 3)
+
+        requestAnimationFrame(animation)
+    }
+
+    animation()
 
 </script>

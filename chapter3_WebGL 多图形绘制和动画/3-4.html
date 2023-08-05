@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <title>3-11 实战：实现动态入场效果 -- 淡入淡出</title>
-    <script src="./lib/index.js"></script>
+    <title>3-4 图形平移 - 着色器</title>
+    <script src="../lib/index.js"></script>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
         #canvas {
             margin: 50px auto 0;
             display: block;
-            /*background: yellow;*/
+            background: yellow;
         }
     </style>
 </head>
@@ -32,36 +32,31 @@
     // 创建着色器源码
     const VERTEX_SHADER_SOURCE = `
         attribute vec4 aPosition;
+        attribute float aTranslate;
         void main() {
-          gl_Position = aPosition; // vec4(0.0,0.0,0.0,1.0)
+          gl_Position = vec4(aPosition.x + aTranslate, aPosition.y, aPosition.z, 1.0); // vec4(0.0,0.0,0.0,1.0)
           gl_PointSize = 10.0;
         }
     `; // 顶点着色器
 
 
     const FRAGMENT_SHADER_SOURCE = `
-        precision lowp float;
-        uniform float uOpacity;
-
         void main() {
-          gl_FragColor = vec4(1.0,0.0,0.0,uOpacity);
+          gl_FragColor = vec4(1.0, 0.0, 0.0,1.0);
         }
     `; // 片元着色器
 
     const program = initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE)
 
-    console.log(program)
-
     // 获取 attribute 变量
     const aPosition = gl.getAttribLocation(program, 'aPosition')
-    const uOpacity = gl.getUniformLocation(program, 'uOpacity')
-    console.log(aPosition, uOpacity)
+    const aTranslate = gl.getAttribLocation(program, 'aTranslate')
+
 
     const points = new Float32Array([
-        -1.0, -1.0,
-        1.0, -1.0,
-        -1.0, 1.0,
-        1.0, 1.0,
+        -0.5, -0.5,
+        0.5, -0.5,
+        0.0, 0.5,
     ])
 
     // 创建缓冲区对象
@@ -69,26 +64,23 @@
     // 绑定缓冲区对象
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
     // 将数据写入缓冲区对象
-    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW)
+    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW) // STATIC_DRAW 写入一次绘制多次
     // 将缓冲区对象分配给一个 attribute变量
     gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0)
     // 开启 attribute 变量
     gl.enableVertexAttribArray(aPosition)
-    // gl.vertexAttrib2f(aPosition, 0.0, 0.0)
 
 
     // 绘图
-    let value = 0
+    let x = -1
+    setInterval(() => {
+        x += 0.01
+        if (x > 1) {
+            x = -1
+        }
+        gl.vertexAttrib1f(aTranslate, x)
+        gl.drawArrays(gl.TRIANGLES, 0, 3) // 三角形
+    }, 60)
 
-    function run() {
-        value += 0.01
-
-        gl.uniform1f(uOpacity, value)
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
-
-        requestAnimationFrame(run)
-    }
-
-    run()
 
 </script>

@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <title>3-11 实战：实现动态入场效果 -- 百叶窗</title>
-    <script src="./lib/index.js"></script>
+    <title>3-2 多缓冲区和数据偏移</title>
+    <script src="../lib/index.js"></script>
     <style>
         * {
             margin: 0;
@@ -33,51 +33,31 @@
     const VERTEX_SHADER_SOURCE = `
         // 只传递顶点数据
         attribute vec4 aPosition;
-        varying vec4 vPosition;
-
+        attribute float aPointSize;
         void main() {
-          vPosition = aPosition;
-
           gl_Position = aPosition; // vec4(0.0,0.0,0.0,1.0)
-          gl_PointSize = 10.0;
+          gl_PointSize = aPointSize;
         }
     `; // 顶点着色器
 
 
     const FRAGMENT_SHADER_SOURCE = `
-        precision lowp float;
-        uniform float uHeight;
-        varying vec4 vPosition;
-        uniform float list[5]; // 声明一个数组变量
-
         void main() {
-          for(int i = 0; i < 5; i++) {
-            if (vPosition.y > list[i + 1] && vPosition.y < list[i]) {
-              if (vPosition.y > uHeight - float(i) * 0.5) {
-                gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-              }
-            }
-          }
+          gl_FragColor = vec4(1.0, 0.0, 0.0,1.0);
         }
     `; // 片元着色器
-    console.log(gl)
-    const program = initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE)
 
-    console.log(program)
+    const program = initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE)
 
     // 获取 attribute 变量
     const aPosition = gl.getAttribLocation(program, 'aPosition')
-    const uHeight = gl.getUniformLocation(program, 'uHeight')
-    const uList = gl.getUniformLocation(program, 'list')
-    console.log(aPosition, uHeight, uList)
+    const aPointSize = gl.getAttribLocation(program, 'aPointSize')
 
-    gl.uniform1fv(uList, [1.0, 0.5, 0.0, -0.5, -1.0])
 
     const points = new Float32Array([
-        -1.0, -1.0,
-        1.0, -1.0,
-        -1.0, 1.0,
-        1.0, 1.0,
+        -0.5, -0.5, // 10.0
+        0.5, -0.5, // 20.0
+        0.0, 0.5, // 30.0
     ])
 
     // 创建缓冲区对象
@@ -85,26 +65,26 @@
     // 绑定缓冲区对象
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
     // 将数据写入缓冲区对象
-    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW)
+    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW) // STATIC_DRAW 写入一次绘制多次
     // 将缓冲区对象分配给一个 attribute变量
     gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0)
     // 开启 attribute 变量
     gl.enableVertexAttribArray(aPosition)
 
 
+    const size = new Float32Array([
+        10.0, // 10.0
+        20.0, // 20.0
+        30.0, // 30.0
+    ])
+
+    const sizeBuffer = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, sizeBuffer)
+    gl.bufferData(gl.ARRAY_BUFFER, size, gl.STATIC_DRAW)
+    gl.vertexAttribPointer(aPointSize, 1, gl.FLOAT, false, 0, 0)
+    gl.enableVertexAttribArray(aPointSize)
+
     // 绘图
-    let value = 1
-
-    function run() {
-        value -= 0.01
-
-        gl.uniform1f(uHeight, value)
-        // console.log(value)
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
-
-        requestAnimationFrame(run)
-    }
-
-    run()
+    gl.drawArrays(gl.POINTS, 0, 3)
 
 </script>

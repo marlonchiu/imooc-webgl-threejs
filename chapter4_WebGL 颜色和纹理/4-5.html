@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <title>4-5 实战：实现基于 webgl 的放大镜</title>
-    <script src="./lib/index.js"></script>
+    <script src="../lib/index.js"></script>
     <style>
         * {
             margin: 0;
@@ -144,7 +144,7 @@
 
     function draw() {
 
-        getImage('./assets/content.png', uSampler, 0).then(() => {
+        getImage('../assets/content.png', uSampler, 0).then(() => {
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
         })
 

@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <title>3-9 图形旋转 - 旋转矩阵</title>
-    <script src="./lib/index.js"></script>
+    <title>3-5 图形缩放 - 着色器</title>
+    <script src="../lib/index.js"></script>
     <style>
         * {
             margin: 0;
@@ -32,9 +32,9 @@
     // 创建着色器源码
     const VERTEX_SHADER_SOURCE = `
         attribute vec4 aPosition;
-        uniform mat4 mat;
+        attribute float aScale;
         void main() {
-          gl_Position = mat * aPosition;
+          gl_Position = vec4(aPosition.x * aScale, aPosition.y, aPosition.z, 1.0); // vec4(0.0,0.0,0.0,1.0)
           gl_PointSize = 10.0;
         }
     `; // 顶点着色器
@@ -50,7 +50,7 @@
 
     // 获取 attribute 变量
     const aPosition = gl.getAttribLocation(program, 'aPosition')
-    const mat = gl.getUniformLocation(program, 'mat')
+    const aScale = gl.getAttribLocation(program, 'aScale')
 
 
     const points = new Float32Array([
@@ -72,19 +72,15 @@
 
 
     // 绘图
-    let x = 0
+    let x = 1
+    setInterval(() => {
+        x += 0.1
+        if (x > 2) {
+            x = 1
+        }
+        gl.vertexAttrib1f(aScale, x)
+        gl.drawArrays(gl.TRIANGLES, 0, 3) // 三角形
+    }, 60)
 
-    function animation() {
-        x += 0.01
-
-        const matrix = getRotateMatrix(x)
-        gl.uniformMatrix4fv(mat, false, matrix)
-
-        gl.drawArrays(gl.TRIANGLES, 0, 3)
-
-        requestAnimationFrame(animation)
-    }
-
-    animation()
 
 </script>

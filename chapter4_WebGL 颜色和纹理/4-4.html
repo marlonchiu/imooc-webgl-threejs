@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <title>4-4 使用多重纹理</title>
-    <script src="./lib/index.js"></script>
+    <script src="../lib/index.js"></script>
     <style>
         * {
             margin: 0;
@@ -158,11 +158,11 @@
     //       resolve();
     //     }
     //
-    //     img.src = '../assets/content.png'
+    //     img.src = '.../assets/content.png'
     //   })
     // }
 
-    Promise.all([getImage('./assets/border.png', uSampler, 0), getImage('./assets/content.png', uSampler1, 1)]).then(() => {
+    Promise.all([getImage('../assets/border.png', uSampler, 0), getImage('../assets/content.png', uSampler1, 1)]).then(() => {
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
     })
 

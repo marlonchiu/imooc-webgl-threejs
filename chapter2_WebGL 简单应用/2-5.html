@@ -1,14 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>2-4 绘制一个点</title>
-    <script src="./lib/index.js"></script>
+    <meta charset="UTF-8"/>
+    <title>2-5 webgl 三维坐标系</title>
+    <script src="../lib/index.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #canvas {
+            background: gray;
+        }
+
+        body::after {
+            content: ' ';
+            display: block;
+            width: 1px;
+            height: 400px;
+            background: red;
+            position: absolute;
+            top: 0;
+            left: 200px;
+        }
+
+        body::before {
+            content: ' ';
+            display: block;
+            width: 400px;
+            height: 1px;
+            background: black;
+            position: absolute;
+            top: 200px;
+            left: 0;
+        }
+    </style>
 </head>
+
 <body>
-<canvas id="canvas" width="400" height="400"> 此浏览器不支持canvas </canvas>
+<canvas id="canvas" width="400" height="400">
+    此浏览器不支持canvas
+</canvas>
 </body>
 </html>
+
 <script>
     const ctx = document.getElementById('canvas')
 
@@ -20,9 +56,9 @@
     // 必须要存在 main 函数
     void main() {
       // 要绘制的点的坐标
-      gl_Position = vec4(0.0,0.0,0.0,1.0);
+      gl_Position = vec4(0.5,0.5,0.5,1.0);
       // 点的大小
-      gl_PointSize = 10.0;
+      gl_PointSize = 30.0;
     }
   ` // 顶点着色器
 
@@ -35,27 +71,7 @@
     }
   ` // 片元着色器
 
-    // // 创建着色器
-    // const vertexShader = gl.createShader(gl.VERTEX_SHADER)
-    // const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER)
-
-    // gl.shaderSource(vertexShader, VERTEX_SHADER_SOURCE) // 指定顶点着色器的源码
-    // gl.shaderSource(fragmentShader, FRAGMENT_SHADER_SOURCE) // 指定片元着色器的源码
-
-    // // 编译着色器
-    // gl.compileShader(vertexShader)
-    // gl.compileShader(fragmentShader)
-
-    // // 创建一个程序对象
-    // const program = gl.createProgram()
-
-    // gl.attachShader(program, vertexShader)
-    // gl.attachShader(program, fragmentShader)
-
-    // gl.linkProgram(program)
-
-    // gl.useProgram(program)
-
+    // 创建着色器
     const program = initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE)
 
     // TODO 执行绘制

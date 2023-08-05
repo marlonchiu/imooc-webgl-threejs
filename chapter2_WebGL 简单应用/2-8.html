@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <title>2-7 通过鼠标控制绘制</title>
-    <script src="./lib/index.js"></script>
+    <title>2-8 使用 uniform 变量 - 绘制不同颜色的点</title>
+    <script src="../lib/index.js"></script>
     <style>
         * {
             margin: 0;
@@ -31,19 +31,29 @@
 
     // 创建着色器源码
     const VERTEX_SHADER_SOURCE = `
-    // 只传递顶点数据
-    attribute vec4 aPosition;
-    void main() {
-      gl_Position = aPosition; // vec4(0.0,0.0,0.0,1.0)
-      gl_PointSize = 10.0;
-    }
-  `; // 顶点着色器
+        // 只传递顶点数据
+        attribute vec4 aPosition;
+        void main() {
+          gl_Position = aPosition; // vec4(0.0,0.0,0.0,1.0)
+          gl_PointSize = 10.0;
+        }
+    `; // 顶点着色器
+
+    // const FRAGMENT_SHADER_SOURCE = `
+    //     precision mediump float;
+    //     uniform vec4 uColor;
+    //     void main() {
+    //       gl_FragColor = uColor;
+    //     }
+    // `; // 片元着色器
 
     const FRAGMENT_SHADER_SOURCE = `
-    void main() {
-      gl_FragColor = vec4(1.0,0.0,0.0,1.0);
-    }
-  `; // 片元着色器
+        precision mediump float;
+        uniform vec2 uColor;
+        void main() {
+          gl_FragColor = vec4(uColor.r, uColor.g, 0.0,1.0); // vec4  rgba
+        }
+    `; // 片元着色器
 
     const program = initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE)
 
@@ -51,10 +61,14 @@
     // 获取 attribute 变量
     const aPosition = gl.getAttribLocation(program, 'aPosition')
 
-    // 给 attribute 赋值
-    gl.vertexAttrib1f(aPosition, 0.0)
+    const uColor = gl.getUniformLocation(program, 'uColor')
 
+    // 给 attribute 赋值
+    // gl.vertexAttrib1f(aPosition, 0.0)
+    // gl.uniform4f(uColor, 1.0, 0.0, 0.0, 1.0)
     // gl.drawArrays(gl.POINTS, 0, 1)
+
+
     const points = []
 
     // onmousemove 画笔功能
@@ -107,6 +121,9 @@
 
         for (let i = 0; i < points.length; i++) {
             gl.vertexAttrib2f(aPosition, points[i].clickX, points[i].clickY)
+
+            gl.uniform2f(uColor, points[i].clickX, points[i].clickY)
+
             gl.drawArrays(gl.POINTS, 0, 1)
         }
     }

@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <title>3-7 图形平移 - 平移矩阵</title>
-    <script src="./lib/index.js"></script>
+    <title>3-2 多缓冲区和数据偏移</title>
+    <script src="../lib/index.js"></script>
     <style>
         * {
             margin: 0;
@@ -31,11 +31,12 @@
 
     // 创建着色器源码
     const VERTEX_SHADER_SOURCE = `
+        // 只传递顶点数据
         attribute vec4 aPosition;
-        uniform mat4 mat;
+        attribute float aPointSize;
         void main() {
-          gl_Position = mat * aPosition;
-          gl_PointSize = 10.0;
+          gl_Position = aPosition; // vec4(0.0,0.0,0.0,1.0)
+          gl_PointSize = aPointSize;
         }
     `; // 顶点着色器
 
@@ -50,13 +51,13 @@
 
     // 获取 attribute 变量
     const aPosition = gl.getAttribLocation(program, 'aPosition')
-    const mat = gl.getUniformLocation(program, 'mat')
+    const aPointSize = gl.getAttribLocation(program, 'aPointSize')
 
 
     const points = new Float32Array([
-        -0.5, -0.5,
-        0.5, -0.5,
-        0.0, 0.5,
+        -0.5, -0.5, 10.0, // 10.0
+        0.5, -0.5, 20.0, // 20.0
+        0.0,  0.5, 30.0, // 30.0
     ])
 
     // 创建缓冲区对象
@@ -65,29 +66,19 @@
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
     // 将数据写入缓冲区对象
     gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW) // STATIC_DRAW 写入一次绘制多次
+
+    const BYTES = points.BYTES_PER_ELEMENT
+    console.log(BYTES)
+
     // 将缓冲区对象分配给一个 attribute变量
-    gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0)
+    gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, BYTES * 3, 0)
     // 开启 attribute 变量
     gl.enableVertexAttribArray(aPosition)
 
+    gl.vertexAttribPointer(aPointSize, 1, gl.FLOAT, false, BYTES * 3, BYTES * 2)
+    gl.enableVertexAttribArray(aPointSize)
 
     // 绘图
-    let x = -1
-
-    function animation() {
-        x += 0.01
-        if (x > 1) {
-            x = -1
-        }
-
-        const matrix = getTranslateMatrix(x, x)
-        gl.uniformMatrix4fv(mat, false, matrix)
-
-        gl.drawArrays(gl.TRIANGLES, 0, 3)
-
-        requestAnimationFrame(animation)
-    }
-
-    animation()
-
+    gl.drawArrays(gl.POINTS, 0, 3)
+    
 </script>

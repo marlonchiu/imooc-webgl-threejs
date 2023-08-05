@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <title>3-6 图形旋转 - 着色器</title>
-    <script src="./lib/index.js"></script>
+    <title>4-2 从顶点到图形 – webgl 渲染流程介绍</title>
+    <script src="../lib/index.js"></script>
     <style>
         * {
             margin: 0;
@@ -32,19 +32,21 @@
     // 创建着色器源码
     const VERTEX_SHADER_SOURCE = `
         attribute vec4 aPosition;
-        attribute float deg;
+        varying vec4 vColor;
+
         void main() {
-          gl_Position.x = aPosition.x * cos(deg) - aPosition.y * sin(deg);
-          gl_Position.y = aPosition.x * sin(deg) + aPosition.y * cos(deg);
-          gl_Position.z = aPosition.z;
-          gl_Position.w = aPosition.w;
+            vColor = aPosition;
+            gl_Position = aPosition;
         }
     `; // 顶点着色器
 
 
     const FRAGMENT_SHADER_SOURCE = `
+        precision lowp float;
+        varying vec4 vColor;
+
         void main() {
-          gl_FragColor = vec4(1.0, 0.0, 0.0,1.0);
+            gl_FragColor = vColor;
         }
     `; // 片元着色器
 
@@ -52,13 +54,11 @@
 
     // 获取 attribute 变量
     const aPosition = gl.getAttribLocation(program, 'aPosition')
-    const deg = gl.getAttribLocation(program, 'deg')
-
 
     const points = new Float32Array([
         -0.5, -0.5,
         0.5, -0.5,
-        0.0, 0.5,
+        0.0,  0.5,
     ])
 
     // 创建缓冲区对象
@@ -66,31 +66,13 @@
     // 绑定缓冲区对象
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
     // 将数据写入缓冲区对象
-    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW) // STATIC_DRAW 写入一次绘制多次
+    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW)
     // 将缓冲区对象分配给一个 attribute变量
     gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0)
     // 开启 attribute 变量
     gl.enableVertexAttribArray(aPosition)
 
-
     // 绘图
-    let x = 1
-
-    // setInterval(() => {
-    //     x += -0.1
-    //     gl.vertexAttrib1f(deg, x);
-    //     gl.drawArrays(gl.TRIANGLES, 0, 3) // 三角形
-    // }, 60)
-
-    function animation() {
-        x += -0.01
-
-        gl.vertexAttrib1f(deg, x);
-        gl.drawArrays(gl.TRIANGLES, 0, 3) // 三角形
-
-        requestAnimationFrame(animation)
-    }
-
-    animation()
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 3)
 
 </script>
