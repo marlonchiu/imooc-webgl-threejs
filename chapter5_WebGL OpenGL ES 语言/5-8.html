@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>5-8 实战：实现 webgl 小球融合</title>
+    <script src="../lib/index.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #canvas {
+            margin: 50px auto 0;
+            display: block;
+            background: yellow;
+        }
+    </style>
+</head>
+
+<body>
+<canvas id="canvas" width="400" height="400">
+    此浏览器不支持canvas
+</canvas>
+</body>
+</html>
+
+<script>
+
+    // MetaBall 元球
+    // A (x1, y1, z1)   B (x2, y2, z2)
+    // C (x3, y3, z3)
+    // Ec = E² / (x1 - x3)² + (y1 - y3)² + (z1 - z3)² + E² / (x2 - x3)² + (y2 - y3)² + (z2 - z3)²
+
+    const ctx = document.getElementById('canvas')
+    const gl = ctx.getContext('webgl')
+
+    // 创建着色器源码
+    const VERTEX_SHADER_SOURCE = `
+        // 只传递顶点数据
+        attribute vec4 aPosition;
+
+        void main() {
+            gl_Position = aPosition; // vec4(0.0,0.0,0.0,1.0)
+            gl_PointSize = 10.0;
+        }
+    `; // 顶点着色器
+
+
+    const FRAGMENT_SHADER_SOURCE = `
+        precision lowp float;
+        uniform vec3 metaBalls[2];
+
+        void main() {
+            float x = gl_FragCoord.x;
+            float y = gl_FragCoord.y;
+            float v = 0.0;
+
+        for(int i = 0; i < 2;i ++) {
+            vec3 m = metaBalls[i];
+
+            float dx = m.x - x;
+            float dy = m.y - y;
+
+            float r = m.z;
+
+            v += r * r / (dx * dx + dy * dy);
+        }
+
+        vec4 color;
+
+        if (v > 1.0) {
+            color = vec4(0.0,1.0,0.0,1.0);
+        } else {
+            discard;
+        }
+
+        gl_FragColor = vec4(color.rgb, 1.0);
+    }
+    `; // 片元着色器
+
+    const program = initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE)
+
+    // 获取 attribute 变量
+    const aPosition = gl.getAttribLocation(program, 'aPosition')
+    const metaBalls = gl.getUniformLocation(program, 'metaBalls');
+
+    const points = new Float32Array([
+        -1.0, -1.0,
+        1.0, -1.0,
+        -1.0, 1.0,
+        1.0, 1.0,
+    ])
+
+    let balls = [
+        {
+            y: 180,
+            speed: 0.5,
+        },
+        {
+            y: 300,
+            speed: -0.5,
+        },
+    ];
+
+    // 创建缓冲区对象
+    const buffer = gl.createBuffer()
+    // 绑定缓冲区对象
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+    // 将数据写入缓冲区对象
+    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW) // STATIC_DRAW 写入一次绘制多次
+    // 将缓冲区对象分配给一个 attribute变量
+    gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0)
+    // 开启 attribute 变量
+    gl.enableVertexAttribArray(aPosition)
+
+
+    let time = 0;
+
+    function draw() {
+        time += 1;
+        let data = [];
+
+        for (let i = 0; i < balls.length; i++) {
+            balls[i].y += balls[i].speed;
+
+            if (time % 100 === 0) {
+                balls[i].speed = -balls[i].speed;
+            }
+
+            data.push(
+                250,
+                balls[i].y,
+                30,
+            )
+        }
+
+        gl.uniform3fv(metaBalls, new Float32Array(data));
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+        requestAnimationFrame(draw)
+    }
+
+    draw()
+</script>
