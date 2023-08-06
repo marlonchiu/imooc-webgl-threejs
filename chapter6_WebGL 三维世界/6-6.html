@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>6-6 实战：实现图形圆角</title>
+    <script src="../lib/index.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #canvas {
+            margin: 50px auto 0;
+            display: block;
+            background: yellow;
+        }
+    </style>
+</head>
+
+<body>
+<canvas id="canvas" width="400" height="400">
+    此浏览器不支持canvas
+</canvas>
+</body>
+</html>
+
+<script>
+    const ctx = document.getElementById('canvas')
+    const gl = ctx.getContext('webgl')
+
+    // 创建着色器源码
+    const VERTEX_SHADER_SOURCE = `
+        attribute vec4 aPosition;
+        varying vec4 vPosition;
+
+        void main() {
+            gl_Position = aPosition; // vec4(0.0,0.0,0.0,1.0)
+            vPosition = aPosition;
+            gl_PointSize = 10.0;
+        }
+    `; // 顶点着色器
+
+
+    const FRAGMENT_SHADER_SOURCE = `
+        precision lowp float;
+        uniform float radius;
+        uniform float w;
+        uniform float h;
+        varying vec4 vPosition;
+
+        void setColor(float x, float y, vec2 target) {
+            float d = distance(vec2(target), vec2(x, y));
+
+            if (d > radius) {
+                    discard;
+                } else {
+                    gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+                }
+            }
+
+            void main() {
+            float x = vPosition.x;
+            float y = vPosition.y;
+
+            // 左上
+            vec2 topLeft = vec2(-w + radius, h - radius);
+
+            // 右上
+            vec2 topRight = vec2(w - radius, h - radius);
+
+            // 左下
+            vec2 bottomLeft = vec2(-w + radius, -h + radius);
+
+            // 右下
+            vec2 bottomRight = vec2(w - radius, -h + radius);
+
+            if (x < topLeft.x && y > topLeft.y) {
+                setColor(x, y, topLeft);
+            } else if (x > topRight.x && y > topRight.y) {
+                setColor(x, y, topRight);
+            } else if (x < bottomLeft.x && y < bottomLeft.y) {
+                setColor(x, y, bottomLeft);
+            } else if (x > bottomRight.x && y < bottomRight.y) {
+                setColor(x, y, bottomRight);
+            } else {
+                gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+            }
+        }
+    `; // 片元着色器
+
+    const program = initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE)
+
+    // 获取 attribute 变量
+    const aPosition = gl.getAttribLocation(program, 'aPosition')
+    const radius = gl.getUniformLocation(program, 'radius')
+    const w = gl.getUniformLocation(program, 'w')
+    const h = gl.getUniformLocation(program, 'h')
+
+
+    const size = 0.5;
+    const points = new Float32Array([
+        -size, -size,
+        size, -size,
+        -size, size,
+        size, size,
+    ])
+
+
+    // 创建缓冲区对象
+    const buffer = gl.createBuffer()
+    // 绑定缓冲区对象
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+    // 将数据写入缓冲区对象
+    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW)
+    // 将缓冲区对象分配给一个 attribute变量
+    gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0)
+    // 开启 attribute 变量
+    gl.enableVertexAttribArray(aPosition)
+
+
+    gl.uniform1f(radius, 0.1);
+    gl.uniform1f(w, size);
+    gl.uniform1f(h, size);
+
+    const start = () => {
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        requestAnimationFrame(start)
+    }
+
+    start();
+</script>
