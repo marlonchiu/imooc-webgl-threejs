@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>10-2 基础组件 – 几何体</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/three.js/0.151.3/three.js"></script>
+    <!--    <script src="../lib/three/three.js"></script>-->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+
+</body>
+</html>
+
+<script>
+    // 创建一个场景
+    const scene = new THREE.Scene();
+    // 创建一个相机 视点
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+    // 设置相机的位置
+    camera.position.set(0, 0, 20);
+
+    // 创建一个渲染器
+    const renderer = new THREE.WebGLRenderer();
+    // 设置渲染器尺寸
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+
+    // 添加一个球体
+    const sphereGeometry = new THREE.SphereGeometry(1, 10, 10);
+    const sphereMaterial = new THREE.MeshLambertMaterial({color: 0xff0000, wireframe: false});
+    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+
+    sphere.name = 'sphere'
+    sphere.position.x = 3;
+    sphere.position.z = -10;
+
+    // TODO 添加
+    scene.add(sphere);
+
+
+    // 添加灯光
+    const spotLight = new THREE.SpotLight(0xffffff);
+    spotLight.position.set(-10, 10, 90);
+    scene.add(spotLight);
+
+    // 让两个三维物体 产生阴影，球体立方体，  使用平面接收阴影
+    sphere.castShadow = true;
+    // 设置灯光开启阴影
+    spotLight.castShadow = true;
+    renderer.shadowMapEnabled = true;
+
+
+    function animation() {
+        renderer.render(scene, camera);
+        // requestAnimationFrame(animation);
+    }
+    animation();
+</script>
