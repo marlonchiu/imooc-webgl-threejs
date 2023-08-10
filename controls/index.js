@@ -37,6 +37,7 @@ const itemType = {
     AmbientLight: ['color'], // 环境光
     PointLight: ['color', 'intensity', 'distance'], // 点光源
     DirectionalLight: ['color', 'intensity'], // 平行光
+    HemisphereLight: ['skyColor', 'groundColor', 'intensity'], // 半球光
 }
 
 function initControls(item) {
