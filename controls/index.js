@@ -28,7 +28,24 @@ const basicType = {
         extends: [0, 20],
         getValue: item => item.exponent,
         setValue: (item, value) => item.exponent = +value,
-    }
+    },
+    opacity: {
+        extends: [0,1],
+        getValue: item => item.opacity,
+        setValue: (item, value) => item.opacity = +value,
+    },
+    transparent: {
+        getValue: item => item.transparent,
+        setValue: (item, value) => item.transparent = value,
+    },
+    wireframe: {
+        getValue: item => item.wireframe,
+        setValue: (item, value) => item.wireframe = value,
+    },
+    visible: {
+        getValue: item => item.visible,
+        setValue: (item, value) => item.visible = value,
+    },
 }
 
 
@@ -38,6 +55,7 @@ const itemType = {
     PointLight: ['color', 'intensity', 'distance'], // 点光源
     DirectionalLight: ['color', 'intensity'], // 平行光
     HemisphereLight: ['skyColor', 'groundColor', 'intensity'], // 半球光
+    MeshBasicMaterial: ['color', 'opacity', 'transparent', 'wireframe', 'visible'], // 基础材质
 }
 
 function initControls(item) {
