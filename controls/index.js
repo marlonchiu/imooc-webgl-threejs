@@ -36,6 +36,7 @@ const itemType = {
     SpotLight: ['color', 'intensity', 'distance', 'angle', 'exponent'],// 聚光灯
     AmbientLight: ['color'], // 环境光
     PointLight: ['color', 'intensity', 'distance'], // 点光源
+    DirectionalLight: ['color', 'intensity'], // 平行光
 }
 
 function initControls(item) {
@@ -43,7 +44,7 @@ function initControls(item) {
     const typeList = itemType[item.type]
     const controls = {}
 
-    if (!typeList.length) {
+    if (!typeList || !typeList.length) {
         return false;
     }
 
