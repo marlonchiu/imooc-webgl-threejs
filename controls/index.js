@@ -120,6 +120,10 @@ const basicType = {
     height: getMeshValue([0, 20], 'height'),
     widthSegments: getMeshValue([0, 20], 'widthSegments'),
     heightSegments: getMeshValue([0, 20], 'heightSegments'),
+    radius: getMeshValue([1, 20], 'radius'),
+    segments: getMeshValue([3, 80], 'segments'),
+    thetaStart: getMeshValue([0, Math.PI * 2], 'thetaStart'),
+    thetaLength: getMeshValue([0, Math.PI * 2], 'thetaLength'),
 }
 
 
@@ -184,6 +188,7 @@ const itemType = {
     LineDashedMaterial: ['color', 'dashSize', 'gapSize'], // 直线和虚线 -- 虚线
     PlaneGeometry: ['width', 'height', 'widthSegments', 'heightSegments'], // 二维平面
     PlaneBufferGeometry: ['width', 'height', 'widthSegments', 'heightSegments'], // 二维平面
+    CircleGeometry: ['radius', 'segments', 'thetaStart', 'thetaLength'], // 二维圆
 }
 
 function initControls(item, camera, mesh, scene) {
