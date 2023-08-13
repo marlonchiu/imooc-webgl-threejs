@@ -106,6 +106,16 @@ const basicType = {
         getValue: (item) => item.uniforms.a.value,
         setValue: (item, value, camera) => item.uniforms.a.value = value,
     },
+    dashSize: {
+        extends: [0, 5],
+        getValue: (item) => item.dashSize,
+        setValue: (item, value, camera) => item.dashSize = +value,
+    },
+    gapSize: {
+        extends: [0, 5],
+        getValue: (item) => item.gapSize,
+        setValue: (item, value, camera) => item.gapSize = +value,
+    },
 }
 
 
@@ -121,6 +131,8 @@ const itemType = {
     MeshLambertMaterial: ['opacity', 'transparent', 'wireframe', 'visible', 'side', 'ambient', 'emissive', 'color'], // 郎伯材质
     MeshPhongMaterial: ['opacity', 'transparent', 'wireframe', 'visible', 'side', 'ambient', 'emissive', 'color', 'specular', 'shininess'], // Phong 材质
     ShaderMaterial: ['red', 'alpha'], // 着色器材质
+    LineBasicMaterial: ['color'], // 直线和虚线 -- 直线
+    LineDashedMaterial: ['color', 'dashSize', 'gapSize'], // 直线和虚线 -- 虚线
 }
 
 function initControls(item, camera) {
