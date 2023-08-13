@@ -55,6 +55,23 @@ const basicType = {
         getValue: (item, camera) => camera.far,
         setValue: (item, value, camera) => camera.far = value,
     },
+    side: {
+        extends: [['front', 'back', 'double']],
+        getValue: () => 'front',
+        setValue: (item, value) => {
+            switch (value) {
+                case 'front':
+                    item.side = THREE.FrontSide;
+                    break;
+                case 'back':
+                    item.side = THREE.BackSide;
+                    break;
+                case 'double':
+                    item.side = THREE.DoubleSide;
+                    break;
+            }
+        },
+    },
 }
 
 
@@ -66,6 +83,7 @@ const itemType = {
     HemisphereLight: ['skyColor', 'groundColor', 'intensity'], // 半球光
     MeshBasicMaterial: ['color', 'opacity', 'transparent', 'wireframe', 'visible'], // 基础材质
     MeshDepthMaterial: ['wireframe', 'cameraNear', 'cameraFar'], // 深度材质
+    MeshNormalMaterial: ['opacity', 'transparent', 'wireframe', 'visible', 'side'], // 法向材质
 }
 
 function initControls(item, camera) {
