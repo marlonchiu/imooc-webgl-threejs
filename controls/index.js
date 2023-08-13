@@ -96,6 +96,16 @@ const basicType = {
         getValue: (item) => item.shininess,
         setValue: (item, value, camera) => item.shininess = value,
     },
+    red: {
+        extends: [0, 1],
+        getValue: (item) => item.uniforms.r.value,
+        setValue: (item, value, camera) => item.uniforms.r.value = value,
+    },
+    alpha: {
+        extends: [0, 1],
+        getValue: (item) => item.uniforms.a.value,
+        setValue: (item, value, camera) => item.uniforms.a.value = value,
+    },
 }
 
 
@@ -110,6 +120,7 @@ const itemType = {
     MeshNormalMaterial: ['opacity', 'transparent', 'wireframe', 'visible', 'side'], // 法向材质
     MeshLambertMaterial: ['opacity', 'transparent', 'wireframe', 'visible', 'side', 'ambient', 'emissive', 'color'], // 郎伯材质
     MeshPhongMaterial: ['opacity', 'transparent', 'wireframe', 'visible', 'side', 'ambient', 'emissive', 'color', 'specular', 'shininess'], // Phong 材质
+    ShaderMaterial: ['red', 'alpha'], // 着色器材质
 }
 
 function initControls(item, camera) {
