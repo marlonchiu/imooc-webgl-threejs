@@ -30,8 +30,7 @@ const basicType = {
         setValue: (item, value) => item.exponent = +value,
     },
     opacity: {
-        extends: [0,1],
-        getValue: item => item.opacity,
+        extends: [0, 1], getValue: item => item.opacity,
         setValue: (item, value) => item.opacity = +value,
     },
     transparent: {
@@ -46,6 +45,16 @@ const basicType = {
         getValue: item => item.visible,
         setValue: (item, value) => item.visible = value,
     },
+    cameraNear: {
+        extends: [0, 50],
+        getValue: (item, camera) => camera.near,
+        setValue: (item, value, camera) => camera.near = value,
+    },
+    cameraFar: {
+        extends: [50, 1000],
+        getValue: (item, camera) => camera.far,
+        setValue: (item, value, camera) => camera.far = value,
+    },
 }
 
 
@@ -56,9 +65,10 @@ const itemType = {
     DirectionalLight: ['color', 'intensity'], // 平行光
     HemisphereLight: ['skyColor', 'groundColor', 'intensity'], // 半球光
     MeshBasicMaterial: ['color', 'opacity', 'transparent', 'wireframe', 'visible'], // 基础材质
+    MeshDepthMaterial: ['wireframe', 'cameraNear', 'cameraFar'], // 深度材质
 }
 
-function initControls(item) {
+function initControls(item, camera) {
     console.log(item);
     const typeList = itemType[item.type]
     const controls = {}
@@ -73,12 +83,12 @@ function initControls(item) {
         const child = basicType[typeList[i]]
         if (child) {
             console.log(child)
-            controls[typeList[i]] = child.getValue(item)
+            controls[typeList[i]] = child.getValue(item, camera)
 
             const childExtends = child.extends || [];
 
             gui[child.method || 'add'](controls, typeList[i], ...childExtends).onChange((value) => {
-                child.setValue(item, value,);
+                child.setValue(item, value, camera);
             });
         }
     }
