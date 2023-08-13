@@ -30,7 +30,8 @@ const basicType = {
         setValue: (item, value) => item.exponent = +value,
     },
     opacity: {
-        extends: [0, 1], getValue: item => item.opacity,
+        extends: [0, 1],
+        getValue: item => item.opacity,
         setValue: (item, value) => item.opacity = +value,
     },
     transparent: {
