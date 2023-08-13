@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>13-4 自定义二维图形</title>
+    <title>13-5 立方体</title>
     <!--    <script src="https://cdn.bootcdn.net/ajax/libs/three.js/0.151.3/three.js"></script>-->
     <script src="../lib/three/three.js"></script>
     <script src="../lib/three/dat.gui.js"></script>
@@ -36,13 +36,7 @@
 
     // 添加一个立方体
     // 定义了一个立方体的对象
-    const shape = new THREE.Shape()
-    shape.moveTo(0, 0)
-    shape.lineTo(0, 3)
-    shape.lineTo(3, 3)
-    shape.lineTo(3, 0)
-    shape.lineTo(0, 0)
-    const geometry = new THREE.ShapeGeometry(shape)
+    const geometry = new THREE.BoxGeometry(3, 3, 3, 1, 1, 1);
     // 创建材质
     const lambert = new THREE.MeshLambertMaterial({color: 0xff0000})
     const basic = new THREE.MeshBasicMaterial({wireframe: true})
@@ -61,6 +55,8 @@
     spotLight.position.set(-10, 10, 90);
     scene.add(spotLight);
 
+
+    initControls(geometry, camera, mesh, scene)
 
     function animation() {
         mesh.pointer.rotation.x += 0.01;

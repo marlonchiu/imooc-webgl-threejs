@@ -124,6 +124,8 @@ const basicType = {
     segments: getMeshValue([3, 80], 'segments'),
     thetaStart: getMeshValue([0, Math.PI * 2], 'thetaStart'),
     thetaLength: getMeshValue([0, Math.PI * 2], 'thetaLength'),
+    depth: getMeshValue([0, 20], 'depth'),
+    depthSegments: getMeshValue([0, 20], 'depthSegments'),
 }
 
 
@@ -140,8 +142,10 @@ function createMaterial(geometry) {
 const roundValue = {
     width: 1,
     height: 1,
+    depth: 1,
     widthSegments: 1,
     heightSegments: 1,
+    depthSegments: 1,
 }
 
 function removeAndAdd(item, value, camera, mesh, scene, controls) {
@@ -189,6 +193,7 @@ const itemType = {
     PlaneGeometry: ['width', 'height', 'widthSegments', 'heightSegments'], // 二维平面
     PlaneBufferGeometry: ['width', 'height', 'widthSegments', 'heightSegments'], // 二维平面
     CircleGeometry: ['radius', 'segments', 'thetaStart', 'thetaLength'], // 二维圆
+    BoxGeometry: ['width', 'height', 'depth', 'widthSegments', 'heightSegments', 'depthSegments'], // 立方体
 }
 
 function initControls(item, camera, mesh, scene) {
