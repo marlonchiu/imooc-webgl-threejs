@@ -135,6 +135,9 @@ const basicType = {
     tube: getMeshValue([1, 6], 'tube'),
     tubularSegments: getMeshValue([1, 20], 'tubularSegments'),
     arc: getMeshValue([0, Math.PI * 2], 'arc'),
+    p: getMeshValue([1, 10], 'p'),
+    q: getMeshValue([1, 10], 'q'),
+    heightScale: getMeshValue([0, 5], 'heightScale'),
 }
 
 
@@ -208,6 +211,7 @@ const itemType = {
     SphereGeometry: ['radius', 'widthSegments', 'heightSegments', 'phiStart', 'phiLength', 'thetaStart', 'thetaLength'], // 球体
     CylinderGeometry: ['radiusTop', 'radiusBottom', 'height', 'radialSegments', 'heightSegments', 'openEnded'], // 圆柱体
     TorusGeometry: ['radius', 'tube', 'radialSegments', 'tubularSegments', 'arc'], // 圆环
+    TorusKnotGeometry: ['radius', 'tube', 'radialSegments', 'tubularSegments', 'p', 'q', 'heightScale'], // 纽结
 }
 
 function initControls(item, camera, mesh, scene) {
