@@ -139,6 +139,13 @@ const basicType = {
     q: getMeshValue([1, 10], 'q'),
     heightScale: getMeshValue([0, 5], 'heightScale'),
     detail: getMeshValue([0, 5], 'detail'),
+    size: getMeshValue([1, 10], 'size'),
+    bevelThickness: getMeshValue([1, 30], 'bevelThickness'),
+    bevelSize: getMeshValue([1, 30], 'bevelSize'),
+    bevelEnabled: getMeshValue([], 'bevelEnabled'),
+    bevelSegments: getMeshValue([1, 30], 'bevelSegments'),
+    curveSegments: getMeshValue([1, 30], 'curveSegments'),
+    steps: getMeshValue([1, 10], 'steps'),
 }
 
 const vertices = [
@@ -154,6 +161,20 @@ const indices = [
     1, 3, 0,
     2, 3, 1
 ]
+
+
+const textOptions = {
+    size: 1,
+    height: 1,
+    weight: 'normal',
+    font: 'helvetiker',
+    bevelThickness: 1,
+    bevelSize: 1,
+    bevelEnabled: false,
+    bevelSegments: 1,
+    curveSegments: 1,
+    steps: 1,
+}
 
 function createMaterial(geometry) {
     const lambert = new THREE.MeshLambertMaterial({color: 0xff0000})
@@ -175,9 +196,15 @@ const roundValue = {
     radialSegments: 1,
     tubularSegments: 1,
     detail: 1,
+    size: 1,
+    bevelSegments: 1,
+    curveSegments: 1,
+    steps: 1,
 }
 
+
 const isPolyhedron = item => item.type === 'PolyhedronGeometry';
+const isFont = item => item.type === 'TextGeometry';
 
 function removeAndAdd(item, value, camera, mesh, scene, controls) {
 
@@ -198,7 +225,12 @@ function removeAndAdd(item, value, camera, mesh, scene, controls) {
         arg.unshift(vertices, indices);
     }
 
-    mesh.pointer = createMaterial(new THREE[item.type](...arg))
+    // 如果是文字
+    if (isFont(item)) {
+        mesh.pointer = createMaterial(new THREE[item.type]('THREE', Object.assign(textOptions, controls)))
+    } else {
+        mesh.pointer = createMaterial(new THREE[item.type](...arg))
+    }
 
     mesh.pointer.rotation.set(x, y, z);
     scene.add(mesh.pointer);
@@ -207,7 +239,7 @@ function removeAndAdd(item, value, camera, mesh, scene, controls) {
 function getMeshValue(extend, name) {
     return {
         extends: extend,
-        getValue: (item, camera, mesh) => mesh.children[0].geometry.parameters[name],
+        getValue: (item, camera, mesh) => isFont(item) && textOptions[name] !== undefined ? textOptions[name] : mesh.children[0].geometry.parameters[name],
         setValue: (...arg) => removeAndAdd(...arg),
     }
 }
@@ -238,6 +270,7 @@ const itemType = {
     TetrahedronGeometry: ['radius', 'detail'], // 多面体 -- 正四面体
     OctahedronGeometry: ['radius', 'detail'], // 多面体 -- 正八面体
     IcosahedronGeometry: ['radius', 'detail'], // 多面体 -- 正二十多面体
+    TextGeometry: ['size', 'bevelThickness', 'bevelSize', 'bevelEnabled', 'bevelSegments', 'curveSegments', 'steps'], // 文字
 }
 
 function initControls(item, camera, mesh, scene) {
