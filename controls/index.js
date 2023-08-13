@@ -126,6 +126,8 @@ const basicType = {
     thetaLength: getMeshValue([0, Math.PI * 2], 'thetaLength'),
     depth: getMeshValue([0, 20], 'depth'),
     depthSegments: getMeshValue([0, 20], 'depthSegments'),
+    phiStart: getMeshValue([0, Math.PI * 2], 'phiStart'),
+    phiLength: getMeshValue([0, Math.PI * 2], 'phiLength'),
 }
 
 
@@ -194,6 +196,7 @@ const itemType = {
     PlaneBufferGeometry: ['width', 'height', 'widthSegments', 'heightSegments'], // 二维平面
     CircleGeometry: ['radius', 'segments', 'thetaStart', 'thetaLength'], // 二维圆
     BoxGeometry: ['width', 'height', 'depth', 'widthSegments', 'heightSegments', 'depthSegments'], // 立方体
+    SphereGeometry: ['radius', 'widthSegments', 'heightSegments', 'phiStart', 'phiLength', 'thetaStart', 'thetaLength'], // 球体
 }
 
 function initControls(item, camera, mesh, scene) {
