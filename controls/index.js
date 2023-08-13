@@ -132,6 +132,9 @@ const basicType = {
     radiusBottom: getMeshValue([-20, 20], 'radiusBottom'),
     radialSegments: getMeshValue([1, 60], 'radialSegments'),
     openEnded: getMeshValue([], 'openEnded'),
+    tube: getMeshValue([1, 6], 'tube'),
+    tubularSegments: getMeshValue([1, 20], 'tubularSegments'),
+    arc: getMeshValue([0, Math.PI * 2], 'arc'),
 }
 
 
@@ -153,6 +156,7 @@ const roundValue = {
     heightSegments: 1,
     depthSegments: 1,
     radialSegments: 1,
+    tubularSegments: 1,
 }
 
 function removeAndAdd(item, value, camera, mesh, scene, controls) {
@@ -203,6 +207,7 @@ const itemType = {
     BoxGeometry: ['width', 'height', 'depth', 'widthSegments', 'heightSegments', 'depthSegments'], // 立方体
     SphereGeometry: ['radius', 'widthSegments', 'heightSegments', 'phiStart', 'phiLength', 'thetaStart', 'thetaLength'], // 球体
     CylinderGeometry: ['radiusTop', 'radiusBottom', 'height', 'radialSegments', 'heightSegments', 'openEnded'], // 圆柱体
+    TorusGeometry: ['radius', 'tube', 'radialSegments', 'tubularSegments', 'arc'], // 圆环
 }
 
 function initControls(item, camera, mesh, scene) {
