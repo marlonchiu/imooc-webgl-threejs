@@ -84,6 +84,18 @@ const basicType = {
         getValue: (item) => item.emissive.getHex(),
         setValue: (item, value, camera) => item.emissive = new THREE.Color(value),
     },
+    // 设置高亮部分的颜色
+    specular: {
+        method: 'addColor',
+        getValue: (item) => item.specular.getHex(),
+        setValue: (item, value, camera) => item.specular = new THREE.Color(value),
+    },
+    // 设置高亮部分的亮度
+    shininess: {
+        extends: [0, 100],
+        getValue: (item) => item.shininess,
+        setValue: (item, value, camera) => item.shininess = value,
+    },
 }
 
 
@@ -97,6 +109,7 @@ const itemType = {
     MeshDepthMaterial: ['wireframe', 'cameraNear', 'cameraFar'], // 深度材质
     MeshNormalMaterial: ['opacity', 'transparent', 'wireframe', 'visible', 'side'], // 法向材质
     MeshLambertMaterial: ['opacity', 'transparent', 'wireframe', 'visible', 'side', 'ambient', 'emissive', 'color'], // 郎伯材质
+    MeshPhongMaterial: ['opacity', 'transparent', 'wireframe', 'visible', 'side', 'ambient', 'emissive', 'color', 'specular', 'shininess'], // Phong 材质
 }
 
 function initControls(item, camera) {
