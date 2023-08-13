@@ -138,8 +138,22 @@ const basicType = {
     p: getMeshValue([1, 10], 'p'),
     q: getMeshValue([1, 10], 'q'),
     heightScale: getMeshValue([0, 5], 'heightScale'),
+    detail: getMeshValue([0, 5], 'detail'),
 }
 
+const vertices = [
+    1, 1, 1,
+    -1, -1, 1,
+    -1, 1, -1,
+    1, -1, -1,
+]
+
+const indices = [
+    2, 1, 0,
+    0, 3, 2,
+    1, 3, 0,
+    2, 3, 1
+]
 
 function createMaterial(geometry) {
     const lambert = new THREE.MeshLambertMaterial({color: 0xff0000})
@@ -160,7 +174,10 @@ const roundValue = {
     depthSegments: 1,
     radialSegments: 1,
     tubularSegments: 1,
+    detail: 1,
 }
+
+const isPolyhedron = item => item.type === 'PolyhedronGeometry';
 
 function removeAndAdd(item, value, camera, mesh, scene, controls) {
 
@@ -174,6 +191,11 @@ function removeAndAdd(item, value, camera, mesh, scene, controls) {
             controls[key] = ~~controls[key];
         }
         arg.push(controls[key])
+    }
+
+    // 如果是多面体
+    if (isPolyhedron(item)) {
+        arg.unshift(vertices, indices);
     }
 
     mesh.pointer = createMaterial(new THREE[item.type](...arg))
@@ -212,6 +234,10 @@ const itemType = {
     CylinderGeometry: ['radiusTop', 'radiusBottom', 'height', 'radialSegments', 'heightSegments', 'openEnded'], // 圆柱体
     TorusGeometry: ['radius', 'tube', 'radialSegments', 'tubularSegments', 'arc'], // 圆环
     TorusKnotGeometry: ['radius', 'tube', 'radialSegments', 'tubularSegments', 'p', 'q', 'heightScale'], // 纽结
+    PolyhedronGeometry: ['radius', 'detail'], // 多面体 -- 自定义多面体
+    TetrahedronGeometry: ['radius', 'detail'], // 多面体 -- 正四面体
+    OctahedronGeometry: ['radius', 'detail'], // 多面体 -- 正八面体
+    IcosahedronGeometry: ['radius', 'detail'], // 多面体 -- 正二十多面体
 }
 
 function initControls(item, camera, mesh, scene) {
