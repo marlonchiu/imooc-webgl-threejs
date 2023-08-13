@@ -116,8 +116,57 @@ const basicType = {
         getValue: (item) => item.gapSize,
         setValue: (item, value, camera) => item.gapSize = +value,
     },
+    width: getMeshValue([0, 20], 'width'),
+    height: getMeshValue([0, 20], 'height'),
+    widthSegments: getMeshValue([0, 20], 'widthSegments'),
+    heightSegments: getMeshValue([0, 20], 'heightSegments'),
 }
 
+
+function createMaterial(geometry) {
+    const lambert = new THREE.MeshLambertMaterial({color: 0xff0000})
+    const basic = new THREE.MeshBasicMaterial({wireframe: true})
+
+    return THREE.SceneUtils.createMultiMaterialObject(geometry, [
+        lambert,
+        basic
+    ])
+}
+
+const roundValue = {
+    width: 1,
+    height: 1,
+    widthSegments: 1,
+    heightSegments: 1,
+}
+
+function removeAndAdd(item, value, camera, mesh, scene, controls) {
+
+    const {x, y, z} = mesh.pointer.rotation;
+
+    scene.remove(mesh.pointer);
+    const arg = [];
+
+    for (const key in controls) {
+        if (roundValue[key]) {
+            controls[key] = ~~controls[key];
+        }
+        arg.push(controls[key])
+    }
+
+    mesh.pointer = createMaterial(new THREE[item.type](...arg))
+
+    mesh.pointer.rotation.set(x, y, z);
+    scene.add(mesh.pointer);
+}
+
+function getMeshValue(extend, name) {
+    return {
+        extends: extend,
+        getValue: (item, camera, mesh) => mesh.children[0].geometry.parameters[name],
+        setValue: (...arg) => removeAndAdd(...arg),
+    }
+}
 
 const itemType = {
     SpotLight: ['color', 'intensity', 'distance', 'angle', 'exponent'],// 聚光灯
@@ -133,9 +182,11 @@ const itemType = {
     ShaderMaterial: ['red', 'alpha'], // 着色器材质
     LineBasicMaterial: ['color'], // 直线和虚线 -- 直线
     LineDashedMaterial: ['color', 'dashSize', 'gapSize'], // 直线和虚线 -- 虚线
+    PlaneGeometry: ['width', 'height', 'widthSegments', 'heightSegments'], // 二维平面
+    PlaneBufferGeometry: ['width', 'height', 'widthSegments', 'heightSegments'], // 二维平面
 }
 
-function initControls(item, camera) {
+function initControls(item, camera, mesh, scene) {
     console.log(item);
     const typeList = itemType[item.type]
     const controls = {}
@@ -150,12 +201,12 @@ function initControls(item, camera) {
         const child = basicType[typeList[i]]
         if (child) {
             console.log(child)
-            controls[typeList[i]] = child.getValue(item, camera)
+            controls[typeList[i]] = child.getValue(item, camera, mesh.pointer)
 
             const childExtends = child.extends || [];
 
             gui[child.method || 'add'](controls, typeList[i], ...childExtends).onChange((value) => {
-                child.setValue(item, value, camera);
+                child.setValue(item, value, camera, mesh, scene, controls);
             });
         }
     }
