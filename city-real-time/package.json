@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@tweenjs/tween.js": "^21.0.0",
-    "three": "^0.155.0",
+    "three": "^0.146.0",
     "vue": "^3.3.4"
   },
   "devDependencies": {

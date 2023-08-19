@@ -2,6 +2,7 @@ import { loadFBX } from '../utils/index.js';
 import * as THREE from 'three';
 import * as TWEEN from '@tweenjs/tween.js';
 import { SurroundLine } from '../effect/surroundLine.js';
+import { Background } from '../effect/background.js';
 
 export class City {
     constructor(scene, camera, controls) {
@@ -21,10 +22,15 @@ export class City {
                     new SurroundLine(this.scene, child);
                 }
             });
+
+            this.initEffect()
         });
     }
-    
-    start() {
 
+    initEffect(){
+        new Background(this.scene)
+    }
+    start() {
+    //
     }
 }
