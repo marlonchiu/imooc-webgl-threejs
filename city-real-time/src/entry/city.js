@@ -13,6 +13,10 @@ export class City {
         this.tweenPosition = null;
         this.tweenRotation = null;
 
+        this.height = {
+            value: 5,
+        };
+
         this.loadCity();
     }
 
@@ -22,7 +26,7 @@ export class City {
 
             object.traverse((child) => {
                 if (child.isMesh) {
-                    new SurroundLine(this.scene, child);
+                    new SurroundLine(this.scene, child, this.height);
                 }
             });
 
@@ -105,6 +109,11 @@ export class City {
         if (this.tweenPosition && this.tweenRotation) {
             this.tweenPosition.update();
             this.tweenRotation.update();
+        }
+
+        this.height.value += 0.4;
+        if (this.height.value > 160) {
+            this.height.value = 5;
         }
     }
 }
