@@ -3,4 +3,5 @@ export const color = {
     head: '#ffffff', // 建筑物顶部颜色
     soundLine: '#4f90bb', // 建筑物外围的线条颜色
     risingColor: '#5588AA', // 建筑物扫描线条颜色
+    liveColor: '#ffffff', // 场景扫描的颜色
 }
