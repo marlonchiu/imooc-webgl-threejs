@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>15-4 环境贴图 </title>
+    <!--    <script src="https://cdn.bootcdn.net/ajax/libs/three.js/0.151.3/three.js"></script>-->
+    <script src="../lib/three/three.js"></script>
+    <!-- 轨道控件 -->
+    <script src="../lib/three/OrbitControls.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+
+</body>
+</html>
+
+<script>
+    const clock = new THREE.Clock();
+    // 创建一个场景
+    const scene = new THREE.Scene();
+
+    // 创建一个相机 视点
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+    // 设置相机的位置
+    camera.position.set(100, 100, 0);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+    const controls = new THREE.OrbitControls(camera)
+    controls.minDistance = 1;
+    controls.maxDistance = 50;
+
+    // 创建一个渲染器
+    const renderer = new THREE.WebGLRenderer();
+    // 设置渲染器尺寸
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // 添加灯光
+    const spotLight = new THREE.SpotLight(0xffffff);
+    spotLight.position.set(2000, 8000, 4000);
+    scene.add(spotLight);
+
+    // 创建虚拟的场景
+    const images = [
+        '../assets/sky/right.jpg',
+        '../assets/sky/left.jpg',
+        '../assets/sky/top.jpg',
+        '../assets/sky/bottom.jpg',
+        '../assets/sky/front.jpg',
+        '../assets/sky/back.jpg',
+    ]
+
+    const mats = [];
+    for (let i = 0; i < images.length; i++) {
+        mats.push(new THREE.MeshBasicMaterial({
+            map: THREE.ImageUtils.loadTexture(images[i]),
+            side: THREE.DoubleSide,
+        }))
+    }
+
+
+    const skybox = new THREE.Mesh(new THREE.BoxGeometry(100, 100, 100), new THREE.MeshFaceMaterial(mats))
+
+    scene.add(skybox)
+
+    // 创建一个球体 和 一个立方体
+    const sphereGeometry = new THREE.SphereGeometry(4, 15, 15);
+    const cubeGeometry = new THREE.BoxGeometry(5, 5, 5);
+
+    // 立方体贴图是和环境一致， 球体是跟随当前环境
+    const cubeMaterial = new THREE.MeshBasicMaterial({
+        envMap: THREE.ImageUtils.loadTextureCube(images)
+    })
+
+    // 通过立方体相机来实现
+    const cubeCamera = new THREE.CubeCamera(0.1, 2000, 256);
+    scene.add(cubeCamera);
+
+    const sphereMaterial = new THREE.MeshBasicMaterial({
+        envMap: cubeCamera.renderTarget,
+    })
+
+    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+
+    sphere.position.x = 5;
+    cube.position.x = -5;
+    scene.add(sphere)
+    scene.add(cube)
+
+    const animation = () => {
+        cube.rotation.x += 0.01;
+        cube.rotation.y += 0.01;
+        controls.update(clock.getDelta());
+        // 渲染
+        renderer.render(scene, camera);
+
+        requestAnimationFrame(animation);
+        // 更新立方体相机
+        cubeCamera.updateCubeMap(renderer, scene);
+    }
+
+    animation();
+</script>

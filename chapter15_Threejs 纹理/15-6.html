@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>15-6 实战：实现辉光效果</title>
+    <!--    <script src="https://cdn.bootcdn.net/ajax/libs/three.js/0.151.3/three.js"></script>-->
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+
+</body>
+</html>
+
+<script type="module">
+    import * as THREE from 'https://cdn.skypack.dev/three@v0.129.0';
+    import {OrbitControls} from 'https://cdn.skypack.dev/three@v0.129.0/examples/jsm/controls/OrbitControls.js'
+    import {EffectComposer} from 'https://cdn.skypack.dev/three@v0.129.0/examples/jsm/postprocessing/EffectComposer.js'
+    import {RenderPass} from 'https://cdn.skypack.dev/three@v0.129.0/examples/jsm/postprocessing/RenderPass.js'
+    import {OutlinePass} from 'https://cdn.skypack.dev/three@v0.129.0/examples/jsm/postprocessing/OutlinePass.js'
+    // import { RenderPass, EffectComposer, OutlinePass } from "three-outlinepass"
+
+    const clock = new THREE.Clock();
+    // 创建一个场景
+    const scene = new THREE.Scene();
+
+    // 创建一个相机 视点
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+    // 设置相机的位置
+    camera.position.set(100, 100, 0);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+    // 创建一个渲染器
+    const renderer = new THREE.WebGLRenderer();
+    // 设置渲染器尺寸
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    document.body.appendChild(renderer.domElement);
+
+    // 添加灯光
+    const spotLight = new THREE.SpotLight(0xffffff);
+    spotLight.position.set(2000, 8000, 4000);
+    scene.add(spotLight);
+
+    // 圆柱体
+    const g1 = new THREE.BoxGeometry(18, 18, 18);
+    const g2 = new THREE.BoxGeometry(18, 18, 18);
+
+    const m1 = new THREE.MeshBasicMaterial({color: 0x00ffff});
+    const m2 = new THREE.MeshBasicMaterial({color: 0xff0000});
+
+    const mesh1 = new THREE.Mesh(g1, m1);
+    const mesh2 = new THREE.Mesh(g2, m2);
+    mesh1.position.y = 20;
+    mesh2.position.y = -20;
+
+    scene.add(mesh1);
+    scene.add(mesh2);
+
+    // 辉光效果
+    // 创建了一个渲染通道，这个通道会渲染场景，不会渲染到屏幕上
+    const renderPass = new RenderPass(scene, camera);
+
+    // 分辨率 场景 相机 当前选中的物体，（需要添加辉光效果）
+    const outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera, [mesh2, mesh1]);
+
+    outlinePass.renderToScreen = true // 渲染到屏幕上
+    outlinePass.edgeStrength = 3 // 尺寸
+    outlinePass.edgeGlow = 2 // 发光的强度
+    outlinePass.edgeThickness = 2 // 光晕粗细
+    outlinePass.pulsePeriod = 1 // 闪烁的速度
+    outlinePass.visibleEdgeColor.set('yellow') // 光晕颜色
+
+    // 创建一个组合器对象，添加处理通道
+    const bloom = new EffectComposer(renderer)
+    bloom.setSize(window.innerWidth, window.innerHeight)
+    bloom.addPass(renderPass)
+    bloom.addPass(outlinePass)
+
+
+    function animation() {
+        renderer.render(scene, camera);
+        bloom.render();
+        requestAnimationFrame(animation);
+    }
+
+    animation();
+</script>

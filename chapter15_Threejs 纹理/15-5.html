@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>15-5 canvas贴图</title>
+    <!--    <script src="https://cdn.bootcdn.net/ajax/libs/three.js/0.151.3/three.js"></script>-->
+    <script src="../lib/three/three.js"></script>
+    <!-- 轨道控件 -->
+    <script src="../lib/three/OrbitControls.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+
+</body>
+</html>
+
+<script>
+    const clock = new THREE.Clock();
+    // 创建一个场景
+    const scene = new THREE.Scene();
+
+    // 创建一个相机 视点
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+    // 设置相机的位置
+    camera.position.set(100, 100, 0);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+    const controls = new THREE.OrbitControls(camera)
+    controls.minDistance = 1;
+    controls.maxDistance = 50;
+
+    // 创建一个渲染器
+    const renderer = new THREE.WebGLRenderer();
+    // 设置渲染器尺寸
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    renderer.setClearColor(0xffffff);
+    // 添加灯光
+    const spotLight = new THREE.SpotLight(0xffffff);
+    spotLight.position.set(2000, 8000, 4000);
+    scene.add(spotLight);
+
+    function getSprite() {
+        const canvas = document.createElement('canvas')
+        canvas.width = 160;
+        canvas.height = 160;
+
+        const c = canvas.getContext('2d')
+
+        c.fillStyle = 'red';
+        c.arc(80, 80, 32, 0, Math.PI * 2);
+        c.fill();
+
+        const texture = new THREE.Texture(canvas);
+        texture.needsUpdate = true;
+        return texture;
+    }
+
+    // 一个立方体
+    const cubeGeometry = new THREE.BoxGeometry(5, 5, 5);
+    // 立方体贴图是和环境一致， 球体是跟随当前环境
+    const cubeMaterial = new THREE.MeshBasicMaterial({map: getSprite()})
+
+    const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    scene.add(cube)
+
+    const animation = () => {
+        cube.rotation.x += 0.01;
+        cube.rotation.y += 0.01;
+        controls.update(clock.getDelta());
+        // 渲染
+        renderer.render(scene, camera);
+        requestAnimationFrame(animation);
+    }
+    animation();
+</script>
