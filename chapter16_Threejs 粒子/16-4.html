@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>16-4 粒子图片处理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+
+</body>
+</html>
+
+<script type="module">
+    import * as THREE from 'https://cdn.skypack.dev/three@v0.129.0';
+
+    const clock = new THREE.Clock()
+    // 创建一个场景
+    const scene = new THREE.Scene();
+
+    // 创建一个相机 视点
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+    // 设置相机的位置
+    camera.position.set(0, 0, 100);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+
+    // 创建一个渲染器
+    const renderer = new THREE.WebGLRenderer();
+    // 设置渲染器尺寸
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    document.body.appendChild(renderer.domElement);
+
+    // 添加灯光
+    const spotLight = new THREE.SpotLight(0xffffff);
+    spotLight.position.set(2000, 8000, 4000);
+    scene.add(spotLight);
+
+    const geometry = new THREE.PlaneGeometry(50, 50, 50, 50)
+    const material = new THREE.MeshBasicMaterial({
+        map: new THREE.TextureLoader().load('../assets/pikachu.png'),
+    })
+
+    const indexList = geometry.index.array;
+
+    const {position, normal, uv} = geometry.attributes;
+
+    const p = position.array;
+    const n = normal.array;
+    const u = uv.array;
+    const positionList = []
+    const uvList = []
+    const normalList = []
+
+    Array.from(indexList).forEach(i => {
+        positionList.push(p[i * 3], p[i * 3 + 1], p[i * 3 + 2])
+
+        normalList.push(n[i * 3], n[i * 3 + 1], n[i * 3 + 2])
+
+        uvList.push(u[i * 2], u[i * 2 + 1])
+    })
+
+    // 缓冲几何体
+    const bufferGeometry = new THREE.BufferGeometry()
+    bufferGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positionList), 3))
+    bufferGeometry.setAttribute('originPosition', new THREE.BufferAttribute(new Float32Array(positionList), 3))
+    bufferGeometry.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(normalList), 3))
+    bufferGeometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uvList), 2))
+
+    const plane = new THREE.Mesh(bufferGeometry, material)
+    scene.add(plane)
+
+    // 生成一些配置信息，
+    const animate = []
+    for (let i = 0; i < positionList.length; i += 9) {
+        animate.push({
+            // 开始动画的时间
+            // 动画的完成程度是多少
+            // 每一个动画的起点、终点、和控制点信息
+            startTime: null,
+            process: 0,
+            start: {x: 0, y: 0, z: 0},
+            end: {x: 0, y: 0, z: 0},
+            c1: {x: Math.random() * 10, y: Math.random() * 40 - 20, z: 0},
+            c2: {x: Math.random() * 10, y: Math.random() * 40 - 20, z: 0},
+        })
+    }
+
+    // 贝塞尔曲线
+    const bezier = (start, c1, c2, end, p) => {
+        const result = {}
+        const key = ['x', 'y', 'z']
+
+        const p1 = p * p * p
+        const p2 = p * p * (1 - p)
+        const p3 = p * (1 - p) * (1 - p)
+        const p4 = (1 - p) * (1 - p) * (1 - p)
+
+        for (const k of key) {
+            result[k] =
+                start[k] * p4 +
+                c1[k] * p3 * 3 +
+                c2[k] * p2 * 3 +
+                end[k] * p1;
+        }
+
+        return result;
+    }
+
+    // 是否开始，开始的时间。总的动画时间
+    let startTotal = Date.now();
+    // 总的进度
+    let progress = 0;
+    const circle = 2000;
+    const animation = () => {
+        // 粒子运动
+        // 进度
+        progress = (Date.now() - startTotal) / circle
+        if (progress > 1) {
+            progress = 1;
+        }
+
+        const x = -50 / 2 + 50 * progress;
+        animate.forEach((item, index) => {
+            if (!item.startTime && positionList[index * 2] < x) {
+                item.startTime = Date.now();
+            }
+
+            // 已经开始动画
+            if (item.startTime && item.process < 1) {
+                item.process = (Date.now() - item.startTime) / circle;
+                if (item.process > 1) {
+                    item.process = 1;
+                }
+
+                for (let i = 0; i < 3; i++) {
+                    const cIndex = index * 3 + i;
+
+                    const originPosition = {
+                        x: positionList[cIndex * 3],
+                        y: positionList[cIndex * 3 + 1],
+                        z: positionList[cIndex * 3 + 2]
+                    }
+
+                    const {start, end, c1, c2} = item;
+                    const bezierPosition = bezier(start, c1, c2, end, item.process);
+                    const newPosition = {
+                        x: originPosition.x + bezierPosition.x,
+                        y: originPosition.y + bezierPosition.y,
+                        z: originPosition.z + bezierPosition.z,
+                    }
+
+                    bufferGeometry.attributes.position.setXYZ(cIndex, newPosition.x, newPosition.y, newPosition.z);
+                }
+            }
+        })
+        plane.geometry = bufferGeometry.clone();
+
+        // 渲染
+        renderer.render(scene, camera);
+
+        requestAnimationFrame(animation);
+    }
+    animation()
+</script>
