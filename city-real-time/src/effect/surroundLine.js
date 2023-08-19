@@ -6,7 +6,10 @@ export class SurroundLine {
         this.scene = scene;
         this.child = child;
 
-        this.render()
+        this.createMesh();
+
+        // 创建外围线条
+        this.createLine();
     }
 
     computedMesh() {
@@ -14,7 +17,7 @@ export class SurroundLine {
         this.child.geometry.computeBoundingSphere();
     }
 
-    render() {
+    createMesh() {
         this.computedMesh()
         const {max, min} = this.child.geometry.boundingBox
 
@@ -58,7 +61,7 @@ export class SurroundLine {
                 }
             `,
         })
-        
+
         const mesh = new THREE.Mesh(this.child.geometry, material);
 
         // 让mesh 继承 child 的旋转、缩放、平移
@@ -67,5 +70,45 @@ export class SurroundLine {
         mesh.scale.copy(this.child.scale)
 
         this.scene.add(mesh);
+    }
+
+    createLine() {
+        // 获取建筑物的外围
+        const geometry = new THREE.EdgesGeometry(this.child.geometry)
+
+        // api创建
+        // const material = new THREE.LineBasicMaterial({ color: color.soundLine })
+
+        const {max, min} = this.child.geometry.boundingBox
+        // 自定义线条渲染
+        const material = new THREE.ShaderMaterial({
+            uniforms: {
+                line_color: {
+                    value: new THREE.Color(color.soundLine)
+                },
+            },
+            vertexShader: `
+                void main() {
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position,  1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform vec3 line_color;
+                
+                void main() {
+                    gl_FragColor = vec4(line_color, 1.0);
+                }
+            `,
+        })
+
+        // 创建线条
+        const line = new THREE.LineSegments(geometry, material)
+
+        // 继承建筑物的偏移量和旋转
+        line.scale.copy(this.child.scale)
+        line.rotation.copy(this.child.rotation)
+        line.position.copy(this.child.position)
+
+        this.scene.add(line)
     }
 }
