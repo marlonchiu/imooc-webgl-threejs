@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>16-3 粒子组合成立方体</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <!--    <script src="https://cdn.bootcdn.net/ajax/libs/three.js/0.151.3/three.js"></script>-->
+    <script src="../lib/three/three.js"></script>
+    <script src="../lib/three/tween.min.js"></script>
+    <script src="../lib/three/dat.gui.js"></script>
+</head>
+<body>
+
+</body>
+</html>
+
+<script>
+    const clock = new THREE.Clock();
+
+    // 创建一个场景
+    const scene = new THREE.Scene();
+
+    // 创建一个相机 视点
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+    // 设置相机的位置
+    camera.position.set(0, 30, 100);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+    // 创建一个渲染器
+    const renderer = new THREE.WebGLRenderer();
+    // 设置渲染器尺寸
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // 添加灯光
+    const spotLight = new THREE.SpotLight(0xffffff);
+    spotLight.position.set(2000, 8000, 4000);
+    scene.add(spotLight);
+
+
+    // 创建一个立方体
+    const geometry = new THREE.BoxGeometry(10, 10, 10, 10, 10, 10);
+
+    function getSprite() {
+        const canvas = document.createElement('canvas')
+        const size = 8
+        canvas.width = size * 2;
+        canvas.height = size * 2;
+
+        const c = canvas.getContext('2d')
+
+        const gradient = c.createRadialGradient(size, size, 0, size, size, size);
+        gradient.addColorStop(0.1, 'rgba(0,255,255,1)')
+
+        c.fillStyle = gradient;
+        c.arc(size, size, size / 2, 0, Math.PI * 2);
+        c.fill();
+
+        const texture = new THREE.Texture(canvas)
+        texture.needsUpdate = true;
+        return texture;
+    }
+
+    // 存储原始坐标
+    const indexList = [];
+
+    // 设定当前随机的范围
+    const range = 100;
+
+    const controls = {
+        polymeric: false, // 是否要组合成立方体
+        completeMesh: false, // 组合之后是否要显示立方体
+        showMesh: false, // 是否要现在显示立方体
+    };
+
+    let cloud;
+
+    function createMesh() {
+        cloud = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10, 10, 10, 10), new THREE.MeshNormalMaterial())
+        scene.add(cloud);
+    }
+
+    function createRandomPosition(i) {
+        geometry.vertices[i].x = Math.random() * range - range / 2;
+        geometry.vertices[i].y = Math.random() * range - range / 2;
+        geometry.vertices[i].z = Math.random() * range - range / 2;
+    }
+
+    function createPointCloud() {
+
+        let listen = false;
+        for (let i = 0; i < geometry.vertices.length; i++) {
+            indexList.push({
+                x: geometry.vertices[i].x,
+                y: geometry.vertices[i].y,
+                z: geometry.vertices[i].z
+            })
+            createRandomPosition(i);
+
+            if (controls.polymeric) {
+                const tween = new TWEEN.Tween(geometry.vertices[i]).to(indexList[i], 2000).start();
+                if (!listen) {
+                    listen = true;
+
+                    if (controls.completeMesh) {
+                        tween.onComplete(() => {
+                            scene.remove(cloud);
+                            createMesh();
+                        })
+                    }
+                }
+            }
+        }
+
+
+        const material = new THREE.PointCloudMaterial({
+            size: 2,
+            transparent: true,
+            map: getSprite(),
+        })
+
+        cloud = new THREE.PointCloud(geometry, material);
+        cloud.sortParticles = true;
+        scene.add(cloud);
+    }
+
+    createPointCloud()
+
+    const gui = new dat.GUI();
+    const onChange = () => {
+        scene.remove(cloud);
+        controls.showMesh ? createMesh() : createPointCloud();
+    }
+    for (const key in controls) {
+        gui.add(controls, key).onChange(onChange);
+    }
+
+    const animation = () => {
+        scene.rotation.y += 0.01;
+        // 渲染
+        renderer.render(scene, camera);
+        TWEEN.update();
+
+        requestAnimationFrame(animation);
+    }
+    animation()
+</script>
