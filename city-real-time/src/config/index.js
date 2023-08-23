@@ -7,4 +7,5 @@ export const color = {
     radarColor: '#ff8800', // 雷达的颜色
     wall: '#fab73f', // 光墙的颜色
     circle: '#00bbff', // 扩散圆的颜色
+    ball: '#fab73f', // 半球
 }

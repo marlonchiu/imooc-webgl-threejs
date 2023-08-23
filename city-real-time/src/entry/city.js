@@ -6,6 +6,7 @@ import { Background } from '../effect/background.js';
 import { Radar } from '../effect/radar.js';
 import { Wall } from '../effect/wall.js';
 import { Circle } from '../effect/circle.js';
+import { Ball } from '../effect/ball.js';
 
 export class City {
     constructor(scene, camera, controls) {
@@ -46,6 +47,7 @@ export class City {
         new Radar(this.scene, this.time);
         new Wall(this.scene, this.time);
         new Circle(this.scene, this.time);
+        new Ball(this.scene, this.time);
 
         // 添加点击选择
         this.addClick();
