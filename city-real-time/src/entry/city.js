@@ -7,6 +7,7 @@ import { Radar } from '../effect/radar.js';
 import { Wall } from '../effect/wall.js';
 import { Circle } from '../effect/circle.js';
 import { Ball } from '../effect/ball.js';
+import { Cone } from '../effect/cone.js';
 
 export class City {
     constructor(scene, camera, controls) {
@@ -24,6 +25,11 @@ export class City {
         this.time = {
             value: 0,
         };
+
+        this.top = {
+            value: 0,
+        };
+        this.flag = false;
 
         this.loadCity();
     }
@@ -48,6 +54,7 @@ export class City {
         new Wall(this.scene, this.time);
         new Circle(this.scene, this.time);
         new Ball(this.scene, this.time);
+        new Cone(this.scene, this.time, this.top, this.height);
 
         // 添加点击选择
         this.addClick();
@@ -123,11 +130,16 @@ export class City {
             this.tweenRotation.update();
         }
 
+        this.time.value += delta;
+
         this.height.value += 0.4;
         if (this.height.value > 160) {
             this.height.value = 5;
         }
 
-        this.time.value += delta;
+        if (this.top.value > 15 || this.top.value < 0) {
+            this.flag = !this.flag;
+        }
+        this.top.value += this.flag ? -0.8 : 0.8;
     }
 }
