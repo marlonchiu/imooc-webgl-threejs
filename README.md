@@ -19,4 +19,7 @@
     * 哈哈
     * [imageio-binaries](https://github.com/imageio/imageio-binaries)
 
+2. 生成font 文件
+> [Facetype.js](https://gero3.github.io/facetype.js/)
+
 

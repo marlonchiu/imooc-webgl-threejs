@@ -10,6 +10,7 @@ import { Ball } from '../effect/ball.js';
 import { Cone } from '../effect/cone.js';
 import { Fly } from '../effect/fly.js';
 import { Road } from '../effect/road.js';
+import { Font } from '../effect/font.js';
 
 export class City {
     constructor(scene, camera, controls) {
@@ -59,6 +60,7 @@ export class City {
         new Cone(this.scene, this.time, this.top, this.height);
         new Fly(this.scene, this.time);
         new Road(this.scene, this.time);
+        new Font(this.scene);
 
         // 添加点击选择
         this.addClick();
