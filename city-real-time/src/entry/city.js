@@ -8,6 +8,7 @@ import { Wall } from '../effect/wall.js';
 import { Circle } from '../effect/circle.js';
 import { Ball } from '../effect/ball.js';
 import { Cone } from '../effect/cone.js';
+import { Fly } from '../effect/fly.js';
 
 export class City {
     constructor(scene, camera, controls) {
@@ -55,6 +56,7 @@ export class City {
         new Circle(this.scene, this.time);
         new Ball(this.scene, this.time);
         new Cone(this.scene, this.time, this.top, this.height);
+        new Fly(this.scene, this.time);
 
         // 添加点击选择
         this.addClick();

@@ -9,4 +9,5 @@ export const color = {
     circle: '#00bbff', // 扩散圆的颜色
     ball: '#fab73f', // 半球
     cone: '#ffff00', // 四棱锥
+    fly: '#00bbff', // 飞线
 }
