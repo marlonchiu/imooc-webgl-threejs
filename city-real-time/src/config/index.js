@@ -10,4 +10,5 @@ export const color = {
     ball: '#fab73f', // 半球
     cone: '#ffff00', // 四棱锥
     fly: '#00bbff', // 飞线
+    road: '#00bbff', // 路径
 }

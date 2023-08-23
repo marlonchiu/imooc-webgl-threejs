@@ -1,64 +1,34 @@
 import * as THREE from 'three'
 import { color } from '../config'
 
-export class Fly {
+export class Road {
     constructor(scene, time) {
         this.scene = scene;
         this.time = time;
 
-        this.createFly({
-            // 起始点
-            source: {
-                x: 300,
-                y: 0,
-                z: -200,
-            },
-            // 终止点
-            target: {
-                x: -500,
-                y: 0,
-                z: -240,
-            },
+        this.createRoad({
             range: 200,
-            height: 300,
-            color: color.fly,
+            color: color.road,
             size: 30,
+            total: 400
         })
     }
 
-    createFly(options) {
-        // 起始点
-        const source = new THREE.Vector3(
-            options.source.x,
-            options.source.y,
-            options.source.z,
-        )
-
-        // 终止点
-        const target = new THREE.Vector3(
-            options.target.x,
-            options.target.y,
-            options.target.z,
-        )
-
-        // 通过起始点和终止点来计算中心位置
-        const center = target.clone().lerp(source, 0.5);
-        // 设置中心位置的高度
-        center.y += options.height;
-
-        // 起点到终点的距离
-        const len = parseInt(source.distanceTo(target));
-
-        // 添加贝塞尔曲线运动
-        const curve = new THREE.QuadraticBezierCurve3(
-            source, center, target
-        )
+    createRoad(options) {
+        const curve = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(-320, 0, 160),
+            new THREE.Vector3(-150, 0, -40),
+            new THREE.Vector3(-10, 0, -35),
+            new THREE.Vector3(40, 0, 40),
+            new THREE.Vector3(30, 0, 150),
+            new THREE.Vector3(-100, 0, 310),
+        ]);
 
         // 获取粒子
-        const points = curve.getPoints(len);
+        const points = curve.getPoints(options.total);
 
-        const positions = []
-        const aPositions = []
+        const positions = [];
+        const aPositions = [];
         points.forEach((item, index) => {
             positions.push(item.x, item.y, item.z)
             aPositions.push(index)
@@ -81,7 +51,7 @@ export class Fly {
                     value: options.size
                 },
                 u_total: {
-                    value: len,
+                    value: options.total,
                 },
                 u_time: this.time,
             },
