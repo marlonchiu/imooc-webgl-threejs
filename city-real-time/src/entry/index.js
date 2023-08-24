@@ -25,7 +25,7 @@ export const initCity = () => {
     // 是否有惯性
     controls.enableDamping = true;
     // 是否可以缩放
-    controls.enableZoom = true;
+    controls.enableZoom = false;
     // 最近和最远距离
     controls.minDistance = 100;
     controls.maxDistance = 2000;
