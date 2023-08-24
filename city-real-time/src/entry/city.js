@@ -11,6 +11,7 @@ import { Cone } from '../effect/cone.js';
 import { Fly } from '../effect/fly.js';
 import { Road } from '../effect/road.js';
 import { Font } from '../effect/font.js';
+import { Snow } from '../effect/snow.js';
 
 export class City {
     constructor(scene, camera, controls) {
@@ -33,6 +34,8 @@ export class City {
             value: 0,
         };
         this.flag = false;
+
+        this.effect = {};
 
         this.loadCity();
     }
@@ -61,6 +64,8 @@ export class City {
         new Fly(this.scene, this.time);
         new Road(this.scene, this.time);
         new Font(this.scene);
+
+        this.effect.snow = new Snow(this.scene);
 
         // 添加点击选择
         this.addClick();
@@ -131,6 +136,10 @@ export class City {
     }
 
     start(delta) {
+        for (const key in this.effect) {
+            this.effect[key] && this.effect[key].animation();
+        }
+
         if (this.tweenPosition && this.tweenRotation) {
             this.tweenPosition.update();
             this.tweenRotation.update();
