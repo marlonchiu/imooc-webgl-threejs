@@ -44,9 +44,6 @@ export class Points {
                 Math.random() * this.range - this.range / 2,
             )
 
-            position.speedX = Math.random() - 0.5;
-            position.speedY = Math.random() + 4;
-            position.speedZ = Math.random() - 0.5;
 
             this.setPosition(position);
 

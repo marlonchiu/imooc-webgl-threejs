@@ -1,29 +1,25 @@
 import * as THREE from 'three'
 import { Points } from './points'
 
-export class Snow {
+export class Rain {
     constructor(scene) {
 
         this.points = new Points(scene, {
-            size: 30,
-            opacity: 0.8,
+            size: 10,
+            opacity: 0.4,
             range: 1000,
-            count: 600,
+            count: 800,
             setAnimation(position) {
-                position.x -= position.speedX;
                 position.y -= position.speedY;
-                position.z -= position.speedZ;
 
                 if (position.y <= 0) {
                     position.y = this.range / 2;
                 }
             },
             setPosition(position) {
-                position.speedX = Math.random() - 0.5;
-                position.speedY = Math.random() + 4;
-                position.speedZ = Math.random() - 0.5;
+                position.speedY = 20;
             },
-            url: '../../src/assets/snow.png',
+            url: '../../src/assets/rain.png',
         });
 
         // this.scene = scene;
@@ -31,7 +27,7 @@ export class Snow {
         // // 范围
         // this.range = 1000;
         // // 雪花的个数
-        // this.count = 600;
+        // this.count = 800;
         //
         // this.pointList = [];
         //
@@ -44,10 +40,10 @@ export class Snow {
 
         // 材质
         this.material = new THREE.PointsMaterial({
-            size: 30,
-            map: new THREE.TextureLoader().load('../../src/assets/snow.png'),
+            size: 10,
+            map: new THREE.TextureLoader().load('../../src/assets/rain.png'),
             transparent: true,
-            opacity: 0.8,
+            opacity: 0.4,
             depthTest: false,
         })
 
@@ -62,9 +58,7 @@ export class Snow {
                 Math.random() * this.range - this.range / 2,
             )
 
-            position.speedX = Math.random() - 0.5;
-            position.speedY = Math.random() + 4;
-            position.speedZ = Math.random() - 0.5;
+            position.speedY = 20;
 
             this.pointList.push(position)
         }
@@ -78,15 +72,13 @@ export class Snow {
         this.points.animation();
 
         // this.pointList.forEach(position => {
-        //     position.x -= position.speedX;
         //     position.y -= position.speedY;
-        //     position.z -= position.speedZ;
         //
         //     if (position.y <= 0) {
         //         position.y = this.range / 2;
         //     }
         //
         // })
-        // this.points.geometry.setFromPoints(this.pointList);
+        // this.point.geometry.setFromPoints(this.pointList);
     }
 }

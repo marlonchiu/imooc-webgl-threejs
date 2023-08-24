@@ -12,6 +12,7 @@ import { Fly } from '../effect/fly.js';
 import { Road } from '../effect/road.js';
 import { Font } from '../effect/font.js';
 import { Snow } from '../effect/snow.js';
+import { Rain } from '../effect/rain.js';
 
 export class City {
     constructor(scene, camera, controls) {
@@ -66,6 +67,7 @@ export class City {
         new Font(this.scene);
 
         this.effect.snow = new Snow(this.scene);
+        this.effect.rain = new Rain(this.scene);
 
         // 添加点击选择
         this.addClick();
