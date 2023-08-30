@@ -13,6 +13,7 @@ import { Road } from '../effect/road.js';
 import { Font } from '../effect/font.js';
 import { Snow } from '../effect/snow.js';
 import { Rain } from '../effect/rain.js';
+import { Smoke } from '../effect/smoke.js';
 
 export class City {
     constructor(scene, camera, controls) {
@@ -69,8 +70,10 @@ export class City {
         // this.effect.snow = new Snow(this.scene);
         // this.effect.rain = new Rain(this.scene);
 
+        this.effect.smoke = new Smoke(this.scene);
+
         // 添加点击选择
-        // this.addClick();
+        this.addClick();
 
         // 跟随鼠标缩放 需要设置 controls.enableZoom = false;
         this.addWheel();
